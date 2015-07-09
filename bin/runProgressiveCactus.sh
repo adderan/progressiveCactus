@@ -18,8 +18,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-binDir=$(dirname $0)
-envFile=${binDir}/../environment
+binPath="$(dirname "$(readlink -f "$0")")"
+
+envFile=${binPath}/../environment
 
 # need to go through this monkey business to make sure arguments with spaces
 # don't get split when passing to python 
@@ -29,5 +30,5 @@ do
 	 options="$options '${arg}'"
 done
 
-. ${envFile} && eval python ${binDir}/../src/progressiveCactus.py "$options"
+. ${envFile} && eval python ${binPath}/../src/progressiveCactus.py "$options"
 exit

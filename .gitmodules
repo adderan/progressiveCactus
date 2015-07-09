@@ -1,63 +1,63 @@
 [submodule "submodules/sonLib"]
 	path = submodules/sonLib
-	url = git://github.com/benedictpaten/sonLib.git
+	url = https://github.com/benedictpaten/sonLib.git
 [submodule "submodules/jobTree"]
 	path = submodules/jobTree
-	url = git://github.com/benedictpaten/jobTree.git
+	url = http://github.com/benedictpaten/jobTree.git
 [submodule "submodules/matchingAndOrdering"]
 	path = submodules/matchingAndOrdering
-	url = git://github.com/benedictpaten/matchingAndOrdering.git
+	url = http://github.com/benedictpaten/matchingAndOrdering.git
 [submodule "submodules/pinchesAndCacti"]
 	path = submodules/pinchesAndCacti
-	url = git://github.com/benedictpaten/pinchesAndCacti.git
+	url = http://github.com/benedictpaten/pinchesAndCacti.git
 [submodule "submodules/hal"]
 	path = submodules/hal
-	url = git://github.com/glennhickey/hal.git
+	url = http://github.com/glennhickey/hal.git
 [submodule "submodules/cactus2hal"]
 	path = submodules/cactus2hal
-	url = git://github.com/glennhickey/cactus2hal.git
+	url = http://github.com/glennhickey/cactus2hal.git
 [submodule "submodules/cactus"]
 	path = submodules/cactus
-	url = git://github.com/benedictpaten/cactus.git
+	url = http://github.com/adderan/cactus.git
 [submodule "submodules/kyototycoon"]
 	path = submodules/kyototycoon
-	url = git://github.com/UCSCReconGroup/kyototycoon.git
+	url = http://github.com/UCSCReconGroup/kyototycoon.git
 [submodule "submodules/tokyocabinet"]
 	path = submodules/tokyocabinet
-	url = git://github.com/UCSCReconGroup/tokyocabinet.git
+	url = http://github.com/UCSCReconGroup/tokyocabinet.git
 [submodule "submodules/hdf5"]
 	path = submodules/hdf5
-	url = git://github.com/UCSCReconGroup/hdf5.git
+	url = http://github.com/UCSCReconGroup/hdf5.git
 [submodule "submodules/kyotocabinet"]
 	path = submodules/kyotocabinet
-	url = git://github.com/UCSCReconGroup/kyotocabinet.git
+	url = http://github.com/UCSCReconGroup/kyotocabinet.git
 [submodule "submodules/virtualenv"]
 	path = submodules/virtualenv
-	url = git://github.com/pypa/virtualenv.git
+	url = http://github.com/pypa/virtualenv.git
 [submodule "submodules/networkx"]
 	path = submodules/networkx
-	url = git://github.com/networkx/networkx.git
+	url = http://github.com/networkx/networkx.git
 [submodule "submodules/psutil"]
 	path = submodules/psutil
-	url = git://github.com/tamentis/psutil.git
+	url = http://github.com/tamentis/psutil.git
 [submodule "submodules/cactusTestData"]
 	path = submodules/cactusTestData
-	url = git://github.com/UCSCReconGroup/cactusTestData.git
+	url = http://github.com/UCSCReconGroup/cactusTestData.git
 [submodule "submodules/pbs-drmaa"]
 	path = submodules/pbs-drmaa
-	url = git://github.com/UCSCReconGroup/pbs-drmaa
+	url = http://github.com/UCSCReconGroup/pbs-drmaa
 [submodule "submodules/drmaa-python"]
 	path = submodules/drmaa-python
-	url = git://github.com/UCSCReconGroup/drmaa-python
+	url = http://github.com/UCSCReconGroup/drmaa-python
 [submodule "submodules/zlib"]
 	path = submodules/zlib
-	url = git://github.com/madler/zlib
+	url = http://github.com/madler/zlib
 [submodule "submodules/clapack"]
 	path = submodules/clapack
-	url = git://github.com/UCSCReconGroup/clapack
+	url = http://github.com/UCSCReconGroup/clapack
 [submodule "submodules/phast"]
 	path = submodules/phast
-	url = git://github.com/UCSCReconGroup/phast
+	url = http://github.com/UCSCReconGroup/phast
 [submodule "submodules/biopython"]
 	path = submodules/biopython
 	url = https://github.com/biopython/biopython.git
