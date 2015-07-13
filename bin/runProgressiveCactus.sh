@@ -19,6 +19,8 @@
 #
 
 binPath="$(dirname "$(readlink -f "$0")")"
+rootPath=${binPath}/..
+export rootPath
 
 envFile=${binPath}/../environment
 
