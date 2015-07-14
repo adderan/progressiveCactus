@@ -1,5 +1,4 @@
-#rootPath="$(dirname "$(readlink -f "$0")")"
-
+echo ${rootPath}
 deactivate () {
     unset pydoc
 
@@ -78,29 +77,24 @@ if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
     hash -r 2>/dev/null
 fi
 
-export PYTHONPATH=${rootPath}/submodules:$PYTHONPATH
+
+export PYTHONPATH=${rootPath}/lib:$PYTHONPATH
+export PATH=${rootPath}/bin/python:$PATH
+export PATH=${rootPath}/bin/zlib:$PATH
 export PATH=${rootPath}/python/bin:$PATH
-export PATH=${rootPath}/submodules/zlib/bin:$PATH
 
-#only needed for dynamically-linked default build
-#export LD_LIBRARY_PATH=${rootPath}/submodules/zlib/lib:${rootPath}/submodules/kyotocabinet/lib:${rootPath}/submodules/kyototycoon/lib:
-#export tokyoCabinetIncl="-I${rootPath}/submodules/tokyocabinet/include -DHAVE_TOKYO_CABINET=1"
-#export tokyoCabinetLib="-L${rootPath}/submodules/tokyocabinet/lib -Wl,-rpath,${rootPath}/submodules/tokyocabinet/lib -ltokyocabinet -lz -lbz2 -lpthread -lm"
-#export kyotoTycoonIncl="-I${rootPath}/submodules/kyotocabinet/include -I${rootPath}/submodules/kyototycoon/include -DHAVE_KYOTO_TYCOON=1"
-#export kyotoTycoonLib="-L${rootPath}/submodules/kyototycoon/lib -L${rootPath}/submodules/kyotocabinet/lib -Wl,-rpath,${rootPath}/submodules/kyototycoon/lib -lkyototycoon -lkyotocabinet -lz -lbz2 -lpthread -lm -lstdc++"
+export PATH=${rootPath}/bin/kyotocabinet:$PATH
+export PATH=${rootPath}/bin/kyototycoon:$PATH
 
-export PATH=${rootPath}/submodules/kyotocabinet/bin:$PATH
-export PATH=${rootPath}/submodules/kyototycoon/bin:$PATH
-
-export PATH=${rootPath}/submodules/phast/bin:$PATH
-export PATH=${rootPath}/submodules/kentToolBinaries:$PATH
-export PATH=${rootPath}/submodules/hdf5/bin:$PATH
-export SON_TRACE_DATASETS=${rootPath}/submodules/cactusTestData
-export PATH=${rootPath}/submodules/sonLib/bin:$PATH
-export PATH=${rootPath}/submodules/jobTree/bin:$PATH
-export PATH=${rootPath}/submodules/pinchesAndCacti/bin:$PATH
-export PATH=${rootPath}/submodules/matchingAndOrdering/bin:$PATH
-export PATH=${rootPath}/submodules/cactus/bin:$PATH
-export PATH=${rootPath}/submodules/hal/bin:$PATH
-export PATH=${rootPath}/submodules/cactus2hal/bin:$PATH
-
+export PATH=${rootPath}/bin/phast:$PATH
+export PATH=${rootPath}/bin/kentToolBinaries:$PATH
+export PATH=${rootPath}/bin/hdf5:$PATH
+export SON_TRACE_DATASETS=${rootPath}/etc/cactusTestData
+export PATH=${rootPath}/bin/sonLib:$PATH
+export PATH=${rootPath}/bin/jobTree:$PATH
+export PATH=${rootPath}/bin/pinchesAndCacti:$PATH
+export PATH=${rootPath}/bin/matchingAndOrdering:$PATH
+export PATH=${rootPath}/bin/cactus:$PATH
+export PATH=${rootPath}/bin/hal:$PATH
+export PATH=${rootPath}/bin/cactus2hal:$PATH
+export PATH=${rootPath}/etc/examples:$PATH

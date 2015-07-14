@@ -7,17 +7,17 @@ sonLibPath=${sonLibRootPath}/lib
 #OVERRIDE SONLIB WITH LOCAL DBS (because now sonlib won't redefine if exist)
 tcPrefix = $(PWD)/tokyocabinet
 tokyoCabinetIncl = -I ${tcPrefix}/include -DHAVE_TOKYO_CABINET=1
-#tokyoCabinetLib = -L${tcPrefix}/lib -Wl,-rpath,${tcPrefix}/lib -ltokyocabinet -lz -lpthread -lm
+all : tokyoCabinetLib=-L${tcPrefix}/lib -Wl,-rpath,${tcPrefix}/lib -ltokyocabinet -lz -lpthread -lm
 #tokyoCabinetLib = ${PWD}/zlib/lib/libz.a ${tcPrefix}/lib/libtokyocabinet.a -lpthread -lm
-tokyoCabinetLib = -L${tcPrefix}/lib -Wl,-Bstatic -ltokyocabinet -lz -Wl,-Bdynamic -lpthread -lm
+static : tokyoCabinetLib=-L${tcPrefix}/lib -Wl,-Bstatic -ltokyocabinet -lz -Wl,-Bdynamic -lpthread -lm
 
 
 kcPrefix =$(PWD)/kyotocabinet
 ttPrefix =$(PWD)/kyototycoon
 kyotoTycoonIncl = -I${kcPrefix}/include -I${ttPrefix}/include -DHAVE_KYOTO_TYCOON=1 -I$(PWD)/zlib/include 
-#kyotoTycoonLib = -L$(PWD)/zlib/lib -L${ttPrefix}/lib -Wl,-rpath,${ttPrefix}/lib -lkyototycoon -L${kcPrefix}/lib -Wl,-rpath,${kcPrefix}/lib -lkyotocabinet -Wl,-rpath,$(PWD)/zlib/lib -lz -lpthread -lm -lstdc++
+all : kyotoTycoonLib = -L$(PWD)/zlib/lib -L${ttPrefix}/lib -Wl,-rpath,${ttPrefix}/lib -lkyototycoon -L${kcPrefix}/lib -Wl,-rpath,${kcPrefix}/lib -lkyotocabinet -Wl,-rpath,$(PWD)/zlib/lib -lz -lpthread -lm -lstdc++
 #kyotoTycoonLib = ${PWD}/zlib/lib/libz.a ${ttPrefix}/lib/libkyototycoon.a ${kcPrefix}/lib/libkyotocabinet.a -lpthread -lm -lstdc++
-kyotoTycoonLib = -L$(PWD)/zlib/lib -L${ttPrefix}/lib -Wl,-Bstatic -lkyototycoon -L${kcPrefix}/lib -Wl,-Bstatic -lkyotocabinet -lz -Wl,-Bdynamic -lpthread -lm -lstdc++
+static : kyotoTycoonLib = -L$(PWD)/zlib/lib -L${ttPrefix}/lib -Wl,-Bstatic -lkyototycoon -L${kcPrefix}/lib -Wl,-Bstatic -lkyotocabinet -lz -Wl,-Bdynamic -lpthread -lm -lstdc++
 
 
 #DISABLE MYSQUL
@@ -50,9 +50,9 @@ CXXFLAGS := $(cppflags) $(CXXFLAGS)
 LD_LIBRARY_PATH := $(PWD)/zlib/lib:$(PWD)/kyotocabinet/lib:$(PWD)/kyototycoon/lib:$(LD_LIBRARY_PATH)
 #UNAME := $(shell uname)
 #ifeq ($(UNAME), Darwin)
-#ktlinkingflags =
+all : ktlinkingflags =
 #else
-ktlinkingflags=--enable-static --disable-shared 
+static : ktlinkingflags=--enable-static --disable-shared 
 #endif
 
 
