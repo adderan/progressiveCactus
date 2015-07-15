@@ -86,6 +86,7 @@ export PATH=${rootPath}/python/bin:$PATH
 export PATH=${rootPath}/bin/kyotocabinet:$PATH
 export PATH=${rootPath}/bin/kyototycoon:$PATH
 
+
 export PATH=${rootPath}/bin/phast:$PATH
 export PATH=${rootPath}/bin/kentToolBinaries:$PATH
 export PATH=${rootPath}/bin/hdf5:$PATH

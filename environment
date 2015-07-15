@@ -83,11 +83,11 @@ export PATH=${rootPath}/python/bin:$PATH
 export PATH=${rootPath}/submodules/zlib/bin:$PATH
 
 #only needed for dynamically-linked default build
-#export LD_LIBRARY_PATH=${rootPath}/submodules/zlib/lib:${rootPath}/submodules/kyotocabinet/lib:${rootPath}/submodules/kyototycoon/lib:
-#export tokyoCabinetIncl="-I${rootPath}/submodules/tokyocabinet/include -DHAVE_TOKYO_CABINET=1"
-#export tokyoCabinetLib="-L${rootPath}/submodules/tokyocabinet/lib -Wl,-rpath,${rootPath}/submodules/tokyocabinet/lib -ltokyocabinet -lz -lbz2 -lpthread -lm"
-#export kyotoTycoonIncl="-I${rootPath}/submodules/kyotocabinet/include -I${rootPath}/submodules/kyototycoon/include -DHAVE_KYOTO_TYCOON=1"
-#export kyotoTycoonLib="-L${rootPath}/submodules/kyototycoon/lib -L${rootPath}/submodules/kyotocabinet/lib -Wl,-rpath,${rootPath}/submodules/kyototycoon/lib -lkyototycoon -lkyotocabinet -lz -lbz2 -lpthread -lm -lstdc++"
+export LD_LIBRARY_PATH=${rootPath}/submodules/zlib/lib:${rootPath}/submodules/kyotocabinet/lib:${rootPath}/submodules/kyototycoon/lib:
+export tokyoCabinetIncl="-I${rootPath}/submodules/tokyocabinet/include -DHAVE_TOKYO_CABINET=1"
+export tokyoCabinetLib="-L${rootPath}/submodules/tokyocabinet/lib -Wl,-rpath,${rootPath}/submodules/tokyocabinet/lib -ltokyocabinet -lz -lbz2 -lpthread -lm"
+export kyotoTycoonIncl="-I${rootPath}/submodules/kyotocabinet/include -I${rootPath}/submodules/kyototycoon/include -DHAVE_KYOTO_TYCOON=1"
+export kyotoTycoonLib="-L${rootPath}/submodules/kyototycoon/lib -L${rootPath}/submodules/kyotocabinet/lib -Wl,-rpath,${rootPath}/submodules/kyototycoon/lib -lkyototycoon -lkyotocabinet -lz -lbz2 -lpthread -lm -lstdc++"
 
 export PATH=${rootPath}/submodules/kyotocabinet/bin:$PATH
 export PATH=${rootPath}/submodules/kyototycoon/bin:$PATH

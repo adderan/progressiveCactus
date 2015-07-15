@@ -28,7 +28,7 @@ install:
 	mkdir ${installdir}
 	mkdir ${installdir}/bin
 	mkdir ${installdir}/lib
-	mkdir ${installdir}/etc
+	mkdir ${installdir}/submodules
 	cp -r submodules/tokyocabinet/bin ${installdir}/bin/tokyocabinet
 	cp -r python/bin/ ${installdir}/bin/python
 	cp -r submodules/kyotocabinet/bin ${installdir}/bin/kyotocabinet
@@ -41,15 +41,14 @@ install:
 	cp -r submodules/cactus/bin ${installdir}/bin/cactus
 	cp -r submodules/hal/bin ${installdir}/bin/hal
 	cp -r submodules/cactus2hal/bin ${installdir}/bin/cactus2hal
-	cp -r submodules/cactusTestData ${installdir}/etc/cactusTestData
-	cp -r examples/ ${installdir}/etc/examples
+	cp -r submodules/cactusTestData ${installdir}/submodules/cactusTestData
+	cp -r examples ${installdir}/submodules/examples
 	cp -r src/ ${installdir}/src
 	cp -r python ${installdir}/
-	#copy over python modules
 	cd submodules && find . -name '*.py' | cpio -pdm ${installdir}/lib
-	#copy over scripts
 	cp installenv ${installdir}/environment
 	cp bin/runProgressiveCactus.sh ${installdir}/bin
+	cp submodules/cactus/cactus_progressive_config.xml ${installdir}/lib/cactus
 
 installClean:
 	rm -rf ${installdir}
