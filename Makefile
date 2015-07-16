@@ -24,37 +24,40 @@ ucsc:
 ucscClean:
 	cd submodules && make justUCSCClean
 
-install:
-	mkdir ${installdir}
-	mkdir ${installdir}/bin
-	mkdir ${installdir}/lib
-	mkdir ${installdir}/submodules
-	cp -r submodules/tokyocabinet/bin ${installdir}/bin/tokyocabinet
-	cp -r python/bin/ ${installdir}/bin/python
-	cp -r submodules/kyotocabinet/bin ${installdir}/bin/kyotocabinet
-	cp -r submodules/kyototycoon/bin ${installdir}/bin/kyototycoon
-	cp -r submodules/phast/bin ${installdir}/bin/phast
-	cp -r submodules/kentToolBinaries ${installdir}/bin/kentToolBinaries
-	cp -r submodules/hdf5/bin ${installdir}/bin/hdf5
-	cp -r submodules/sonLib/bin ${installdir}/bin/sonLib
-	cp -r submodules/jobTree/bin ${installdir}/bin/jobTree
-	cp -r submodules/cactus/bin ${installdir}/bin/cactus
-	cp -r submodules/hal/bin ${installdir}/bin/hal
-	cp -r submodules/cactus2hal/bin ${installdir}/bin/cactus2hal
-	cp -r submodules/cactusTestData ${installdir}/submodules/cactusTestData
-	cp -r examples ${installdir}/submodules/examples
-	cp -r src/ ${installdir}/src
-	cp -r python ${installdir}/
-	cd submodules && find . -name '*.py' | cpio -pdm ${installdir}/lib
-	cp installenv ${installdir}/environment
-	cp bin/runProgressiveCactus.sh ${installdir}/bin
-	cp submodules/cactus/cactus_progressive_config.xml ${installdir}/lib/cactus
+install: localInstall
+	cp -r ${installname} ${installdir}
+localInstall:
+	mkdir ${installname}
+	mkdir ${installname}/bin
+	mkdir ${installname}/lib
+	mkdir ${installname}/submodules
+	cp -r submodules/tokyocabinet/bin ${installname}/bin/tokyocabinet
+	cp -r python/bin/ ${installname}/bin/python
+	cp -r submodules/kyotocabinet/bin ${installname}/bin/kyotocabinet
+	cp -r submodules/kyototycoon/bin ${installname}/bin/kyototycoon
+	cp -r submodules/phast/bin ${installname}/bin/phast
+	cp -r submodules/kentToolBinaries ${installname}/bin/kentToolBinaries
+	cp -r submodules/hdf5/bin ${installname}/bin/hdf5
+	cp -r submodules/sonLib/bin ${installname}/bin/sonLib
+	cp -r submodules/jobTree/bin ${installname}/bin/jobTree
+	cp -r submodules/cactus/bin ${installname}/bin/cactus
+	cp -r submodules/hal/bin ${installname}/bin/hal
+	cp -r submodules/cactus2hal/bin ${installname}/bin/cactus2hal
+	cp -r submodules/cactusTestData ${installname}/submodules/cactusTestData
+	cp -r examples ${installname}/submodules/examples
+	cp -r src/ ${installname}/src
+	cp -r python ${installname}/
+	cd submodules && find . -name '*.py' | cpio -pdm ../${installname}/lib/
+	cp installenv ${installname}/environment
+	cp bin/runProgressiveCactus.sh ${installname}/bin
+	cp submodules/cactus/cactus_progressive_config.xml ${installname}/lib/cactus_progressive_config.xml
 
 installClean:
+	rm -rf ${installname}
 	rm -rf ${installdir}
 static:
 	cd submodules && make static
-dist:
-	tar -zcvf progressiveCactus.tar.gz -C ${prefix} ${installname}
+dist: localInstall
+	tar -zcvf progressiveCactus.tar.gz ${installname}
 distClean:
 	rm progressiveCactus.tar.gz
