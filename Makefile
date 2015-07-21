@@ -48,7 +48,7 @@ localInstall:
 	cp -r src/ ${installname}/src
 	cp -r python ${installname}/
 	cd submodules && find . -name '*.py' | cpio -pdm ../${installname}/lib/
-	cp installenv ${installname}/environment
+	cp environmentForInstall ${installname}/environment
 	cp bin/runProgressiveCactus.sh ${installname}/bin
 	cp submodules/cactus/cactus_progressive_config.xml ${installname}/lib/cactus_progressive_config.xml
 
