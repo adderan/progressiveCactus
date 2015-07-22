@@ -50,7 +50,7 @@ localInstall:
 	cd submodules && find . -name '*.py' | cpio -pdm ../${installname}/lib/
 	cp environmentForInstall ${installname}/environment
 	cp bin/runProgressiveCactus.sh ${installname}/bin
-	cp submodules/cactus/cactus_progressive_config.xml ${installname}/lib/cactus_progressive_config.xml
+	cp submodules/cactus/cactus_progressive_config.xml ${installname}/lib/cactus/cactus_progressive_config.xml
 
 installClean:
 	rm -rf ${installname}

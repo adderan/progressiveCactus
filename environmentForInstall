@@ -1,4 +1,3 @@
-echo ${rootPath}
 deactivate () {
     unset pydoc
 
