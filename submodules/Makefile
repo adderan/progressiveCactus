@@ -132,4 +132,4 @@ test: ${ucscModules:%=test.%}
 test.%:
 	. ${myEnv} && cd $* && make test
 
-static: virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule mafToolsRule treeBuildingEvaluationRule ${ucscModules:%=ucsc.%}
+static: virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule ${ucscModules:%=ucsc.%} mafToolsRule treeBuildingEvaluationRule 
