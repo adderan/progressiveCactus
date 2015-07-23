@@ -44,6 +44,8 @@ localInstall:
 	cp -r submodules/hal/bin ${installname}/bin/hal
 	cp -r submodules/cactus2hal/bin ${installname}/bin/cactus2hal
 	cp -r submodules/cactusTestData ${installname}/submodules/cactusTestData
+	cp -r submodules/treeBuildingEvaluation/bin ${installname}/bin/treeBuildingEvaluation
+	cp -r submodules/mafTools/bin ${installname}/bin/mafTools
 	cp -r examples ${installname}/submodules/examples
 	cp -r src/ ${installname}/src
 	cp -r python ${installname}/

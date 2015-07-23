@@ -1,12 +1,12 @@
 include include.mk
 
-externalModules = zlib tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast kentToolBinaries
+externalModules = zlib tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast kentToolBinaries mafTools treeBuildingEvaluation
 ucscModules = sonLib jobTree pinchesAndCacti matchingAndOrdering cactus hal cactus2hal
 
 modules = ${externalModules} ${ucscModules}
 #modules = ${ucsc}
 
-.PHONY: all %.all justUCSC %.justUCSC envRefreshRule virtPyRule pbsDrmaaRule drmaaPythonRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule kentToolBinariesRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean zlibClean cabinetClean pbsDrmaaClean hdf5Clean clapckClean phastClean kentToolBinariesClean test %.test datasets
+.PHONY: all %.all justUCSC %.justUCSC envRefreshRule virtPyRule pbsDrmaaRule mafToolsRule treeBuildingEvaluationRule drmaaPythonRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule kentToolBinariesRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean zlibClean cabinetClean pbsDrmaaClean hdf5Clean clapckClean phastClean kentToolBinariesClean mafToolsClean treeBuildingEvaluationClean test %.test datasets
 
 all : virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule ${ucscModules:%=ucsc.%}
 
@@ -32,6 +32,10 @@ drmaaPythonRule :
 	cd . 
 endif
 
+mafToolsRule:
+	cd mafTools && make lib.all mafComparator.all
+treeBuildingEvaluationRule:
+	cd treeBuildingEvaluation && export PROGRESSIVE_CACTUS_DIR=../../ && make -e
 zlibRule :
 	cd zlib && ./configure --prefix=$(PWD)/zlib && make && make install
 
@@ -128,4 +132,4 @@ test: ${ucscModules:%=test.%}
 test.%:
 	. ${myEnv} && cd $* && make test
 
-static: virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule ${ucscModules:%=ucsc.%}
+static: virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule mafToolsRule treeBuildingEvaluationRule ${ucscModules:%=ucsc.%}

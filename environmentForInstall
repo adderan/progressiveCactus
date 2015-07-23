@@ -76,7 +76,8 @@ if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
     hash -r 2>/dev/null
 fi
 
-
+export PATH=${rootPath}/bin/mafTools:$PATH
+export PATH=${rootPath}/bin/treeBuildingEvaluation:$PATH
 export PYTHONPATH=${rootPath}/lib:$PYTHONPATH
 export PATH=${rootPath}/bin/python:$PATH
 export PATH=${rootPath}/bin/zlib:$PATH
