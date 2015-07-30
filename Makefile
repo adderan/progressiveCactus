@@ -3,7 +3,7 @@ virtPyDir = $(PWD)/python
 virtPyEnv = ${virtPyDir}/bin/activate
 virtPy = ${virtPyDir}/bin/python
 
-installname=progressiveCactus_v1.0
+installname=progressiveCactus
 installdir=${prefix}/${installname}
 export
 
