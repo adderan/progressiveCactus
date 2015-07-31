@@ -53,6 +53,7 @@ localInstall:
 	cp environmentForInstall ${installname}/environment
 	cp bin/runProgressiveCactus.sh ${installname}/bin
 	cp submodules/cactus/cactus_progressive_config.xml ${installname}/lib/cactus/cactus_progressive_config.xml
+	rootPath=${installname} . ${installname}/environment && pip install biopython
 
 installClean:
 	rm -rf ${installname}
