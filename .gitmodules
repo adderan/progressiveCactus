@@ -1,9 +1,6 @@
 [submodule "submodules/sonLib"]
 	path = submodules/sonLib
 	url = git://github.com/benedictpaten/sonLib.git
-[submodule "submodules/jobTree"]
-	path = submodules/jobTree
-	url = git://github.com/benedictpaten/jobTree.git
 [submodule "submodules/matchingAndOrdering"]
 	path = submodules/matchingAndOrdering
 	url = git://github.com/benedictpaten/matchingAndOrdering.git
@@ -61,3 +58,6 @@
 [submodule "submodules/biopython"]
 	path = submodules/biopython
 	url = https://github.com/biopython/biopython.git
+[submodule "submodules/toil"]
+	path = submodules/toil
+	url = http://github.com/BD2KGenomics/toil
