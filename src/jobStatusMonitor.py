@@ -34,7 +34,7 @@ import signal
 import traceback
 from threading import Thread
 
-from jobTree.src.master import getJobFileDirName, getConfigFileName
+from jobTree.src.master import getJobFileDirName
 from jobTree.src.jobTreeStatus import parseJobFiles
 
 from cactus.progressive.multiCactusProject import MultiCactusProject

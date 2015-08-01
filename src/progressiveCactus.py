@@ -40,10 +40,7 @@ from sonLib.bioio import getTempDirectory
 from sonLib.bioio import system
 from sonLib.bioio import popenCatch
 
-from jobTree.scriptTree.target import Target 
-from jobTree.scriptTree.stack import Stack
-from jobTree.src.master import getJobFileDirName, getConfigFileName
-from jobTree.src.jobTreeStatus import parseJobFiles
+from toil.src.toil.job import Job
 
 from cactus.progressive.multiCactusProject import MultiCactusProject
 from cactus.shared.experimentWrapper import ExperimentWrapper
@@ -51,7 +48,6 @@ from cactus.shared.configWrapper import ConfigWrapper
 
 from seqFile import SeqFile
 from projectWrapper import ProjectWrapper
-from jobStatusMonitor import JobStatusMonitor
 
 def initParser():
     usage = "usage: runProgressiveCactus.sh [options] <seqFile> <workDir> <outputHalFile>\n\n"\
@@ -65,10 +61,10 @@ def initParser():
     
     parser = OptionParser(usage=usage)
 
-    #JobTree Options (method below now adds an option group)
-    Stack.addJobTreeOptions(parser)
-    #Progressive Cactus will handle where the jobtree path is
-    parser.remove_option("--jobTree")
+    #toil Options (method below now adds an option group)
+    Job.Runner.addToilOptions(parser)
+    #Progressive Cactus will handle where the toil path is
+    parser.remove_option("--toil")
 
 
     #Progressive Cactus Options
@@ -92,8 +88,8 @@ def initParser():
                       default=False)
     parser.add_option("--autoAbortOnDeadlock", dest="autoAbortOnDeadlock",
                       action="store_true",
-                      help="Abort automatically when jobTree monitor" +
-                      " suspects a deadlock by deleting the jobTree folder." +
+                      help="Abort automatically when toil monitor" +
+                      " suspects a deadlock by deleting the toil folder." +
                       " Will guarantee no trailing ktservers but still " +
                       " dangerous to use until we can more robustly detect " +
                       " deadlocks.",
@@ -188,12 +184,12 @@ def validateInput(workDir, outputHalFile, options):
             raise RuntimeError("Invalid ktserver type specified: %s. Must be "
                                "memory, snapshot or disk" % options.ktType)    
 
-# Convert the jobTree options taken in by the parser back
+# Convert the toil options taken in by the parser back
 # out to command line options to pass to progressive cactus
-def getJobTreeCommands(jtPath, parser, options):
-    cmds = "--jobTree %s" % jtPath
+def getToilCommands(tPath, parser, options):
+    cmds = "--toil %s" % tPath
     for optGroup in parser.option_groups:
-        if optGroup.title.startswith("jobTree") or optGroup.title.startswith("Jobtree"):
+        if optGroup.title.startswith("toil") or optGroup.title.startswith("Toil"):
             for opt in optGroup.option_list:
                 if hasattr(options, opt.dest) and \
                     getattr(options, opt.dest) != optGroup.defaults[opt.dest]:
@@ -227,13 +223,13 @@ def getEnvFilePath():
 
 # If specified with the risky --autoAbortOnDeadlock option, we call this to
 # force an abort if the jobStatusMonitor thinks it's hopeless.
-# We delete the jobTreePath to get rid of kyoto tycoons.
-def abortFunction(jtPath, options):
+# We delete the toilPath to get rid of kyoto tycoons.
+def abortFunction(tPath, options):
     def afClosure():
         sys.stderr.write('\nAborting due to deadlock (prevent with'
                          + '--noAutoAbort' +
-                         ' option), and running rm -rf %s\n\n' % jtPath)
-        system('rm -rf %s' % jtPath)
+                         ' option), and running rm -rf %s\n\n' % tPath)
+        system('rm -rf %s' % tPath)
         sys.exit(-1)
     if options.autoAbortOnDeadlock:
         return afClosure
@@ -243,7 +239,7 @@ def abortFunction(jtPath, options):
 # Run cactus progressive on the project that has been created in workDir.
 # Any jobtree options are passed along.  Should probably look at redirecting
 # stdout/stderr in the future.
-def runCactus(workDir, jtCommands, jtPath, options):
+def runCactus(workDir, tCommands, tPath, options):
     envFile = getEnvFilePath()
     pjPath = os.path.join(workDir, ProjectWrapper.alignmentDirName,
                           '%s_project.xml' % ProjectWrapper.alignmentDirName)
@@ -260,16 +256,16 @@ def runCactus(workDir, jtCommands, jtPath, options):
         datetime.datetime.now()))
     logHandle.close()
     cmd = '. %s && cactus_progressive.py %s %s %s >> %s 2>&1' % (envFile,
-                                                                 jtCommands,
+                                                                 tCommands,
                                                                  pjPath,
                                                                  overwriteFlag,
                                                                  logFile)
-    jtMonitor = JobStatusMonitor(jtPath, pjPath, logFile,
-                                 deadlockCallbackFn=abortFunction(jtPath,
+    tMonitor = JobStatusMonitor(tPath, pjPath, logFile,
+                                 deadlockCallbackFn=abortFunction(tPath,
                                                                   options))
     if options.database == "kyoto_tycoon":
-        jtMonitor.daemon = True
-        jtMonitor.start()
+        tMonitor.daemon = True
+        tMonitor.start()
         
     system(cmd)
     logHandle = open(logFile, "a")
@@ -341,16 +337,16 @@ def main():
         outputHalFile = args[2]
         validateInput(workDir, outputHalFile, options)
 
-        jtPath = os.path.join(workDir, "jobTree")
+        tPath = os.path.join(workDir, "toil")
         stage = 1
         print "\nBeginning Alignment"
-        system("rm -rf %s" % jtPath) 
+        system("rm -rf %s" % tPath) 
         projWrapper = ProjectWrapper(options, seqFile, workDir)
         projWrapper.writeXml()
-        jtCommands = getJobTreeCommands(jtPath, parser, options)
-        runCactus(workDir, jtCommands, jtPath, options)
-        cmd = 'jobTreeStatus --failIfNotComplete --jobTree %s > /dev/null 2>&1 ' %\
-              jtPath
+        tCommands = getToilCommands(tPath, parser, options)
+        runCactus(workDir, tCommands, tPath, options)
+        cmd = 'toilStatus --failIfNotComplete --toil %s > /dev/null 2>&1 ' %\
+              tPath
         system(cmd)
 
         stage = 2
