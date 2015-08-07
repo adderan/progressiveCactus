@@ -61,3 +61,6 @@
 [submodule "submodules/toil"]
 	path = submodules/toil
 	url = http://github.com/adderan/toil
+[submodule "submodules/jobTree"]
+	path = submodules/jobTree
+	url = http://github.com/benedictpaten/jobTree
