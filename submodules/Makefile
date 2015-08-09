@@ -8,7 +8,7 @@ modules = ${externalModules} ${ucscModules}
 
 .PHONY: all %.all justUCSC %.justUCSC envRefreshRule virtPyRule pbsDrmaaRule drmaaPythonRule zlibRule toilRule tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule kentToolBinariesRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean zlibClean cabinetClean pbsDrmaaClean hdf5Clean clapckClean phastClean kentToolBinariesClean test %.test datasets
 
-all : envRefreshRule virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule datasets ${ucscModules:%=ucsc.%}
+all : envRefreshRule virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule toilRule datasets ${ucscModules:%=ucsc.%}
 
 justUCSC : ${ucscModules:%=ucsc.%}
 
@@ -39,7 +39,7 @@ drmaaPythonRule :
 	cd . 
 endif
 toilRule :
-	cd toil && python setup.py install
+	. ${myEnv} && cd toil && python setup.py install
 zlibRule :
 	cd zlib && ./configure --prefix=$(PWD)/zlib && make && make install
 	echo export PATH=$(PWD)/zlib/bin:\$$PATH >> ${myEnv}
