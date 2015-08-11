@@ -15,7 +15,7 @@
 	url = git://github.com/glennhickey/cactus2hal.git
 [submodule "submodules/cactus"]
 	path = submodules/cactus
-	url = git://github.com/adderan/cactus.git
+	url = http://github.com/adderan/cactus.git
 [submodule "submodules/kyototycoon"]
 	path = submodules/kyototycoon
 	url = git://github.com/UCSCReconGroup/kyototycoon.git
@@ -63,4 +63,4 @@
 	url = http://github.com/benedictpaten/jobTree
 [submodule "submodules/toil"]
 	path = submodules/toil
-	url = http://github.com/adderan/toil
+	url = http://github.com/BD2KGenomics/toil
