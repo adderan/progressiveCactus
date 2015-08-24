@@ -1,6 +1,6 @@
 include include.mk
 
-externalModules = zlib tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast kentToolBinaries toil
+externalModules = zlib tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast kentToolBinaries
 ucscModules = sonLib pinchesAndCacti matchingAndOrdering cactus hal cactus2hal jobTree
 
 modules = ${externalModules} ${ucscModules}
@@ -39,7 +39,7 @@ drmaaPythonRule :
 	cd . 
 endif
 toilRule :
-	. ${myEnv} && cd toil && python setup.py install
+	. ${myEnv} && pip install git+http://github.com/bd2kgenomics/toil
 zlibRule :
 	cd zlib && ./configure --prefix=$(PWD)/zlib && make && make install
 	echo export PATH=$(PWD)/zlib/bin:\$$PATH >> ${myEnv}

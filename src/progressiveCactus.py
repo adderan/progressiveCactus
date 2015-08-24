@@ -35,12 +35,12 @@ import traceback
 import datetime
 
 from sonLib.bioio import logger
-from sonLib.bioio import setLoggingFromOptions
 from sonLib.bioio import getTempDirectory
 from sonLib.bioio import system
 from sonLib.bioio import popenCatch
 
-from toil.src.toil.job import Job
+from toil.job import Job
+from toil.lib.bioio import setLoggingFromOptions
 
 from cactus.progressive.multiCactusProject import MultiCactusProject
 from cactus.shared.experimentWrapper import ExperimentWrapper
@@ -237,7 +237,7 @@ def abortFunction(tPath, options):
         return None
     
 # Run cactus progressive on the project that has been created in workDir.
-# Any jobtree options are passed along.  Should probably look at redirecting
+# Any toil options are passed along.  Should probably look at redirecting
 # stdout/stderr in the future.
 def runCactus(workDir, tCommands, tPath, options):
     envFile = getEnvFilePath()

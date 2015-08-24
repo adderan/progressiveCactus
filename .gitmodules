@@ -61,6 +61,3 @@
 [submodule "submodules/jobTree"]
 	path = submodules/jobTree
 	url = http://github.com/benedictpaten/jobTree
-[submodule "submodules/toil"]
-	path = submodules/toil
-	url = http://github.com/BD2KGenomics/toil
