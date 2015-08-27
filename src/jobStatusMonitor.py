@@ -73,7 +73,7 @@ class JobStatusMonitor(Thread):
     # expert at doing this. If the same jobs are running as last time we polled
     # add the polltime to sameJobsTime
     ###########################################################################
-    def __pollJobTree(self):
+    def __pollToil(self):
         childJobFileToParentJob, childCounts =  {}, {}
         updatedJobFiles, shellJobs = set(), set()
         try:

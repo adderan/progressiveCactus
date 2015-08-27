@@ -8,7 +8,7 @@ modules = ${externalModules} ${ucscModules}
 
 .PHONY: all %.all justUCSC %.justUCSC envRefreshRule virtPyRule pbsDrmaaRule drmaaPythonRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule kentToolBinariesRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean zlibClean cabinetClean pbsDrmaaClean hdf5Clean clapckClean phastClean kentToolBinariesClean test %.test datasets
 
-all : envRefreshRule virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule datasets ${ucscModules:%=ucsc.%}
+all : envRefreshRule virtPyRule toilRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule datasets ${ucscModules:%=ucsc.%}
 
 justUCSC : ${ucscModules:%=ucsc.%}
 
@@ -38,6 +38,9 @@ pbsDrmaaRule :
 drmaaPythonRule :
 	cd . 
 endif
+
+toilRule:
+	. ${myEnv} && pip install git+http://github.com/bd2kgenomics/toil
 
 zlibRule :
 	cd zlib && ./configure --prefix=$(PWD)/zlib && make && make install

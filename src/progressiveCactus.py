@@ -35,15 +35,12 @@ import traceback
 import datetime
 
 from sonLib.bioio import logger
-from sonLib.bioio import setLoggingFromOptions
 from sonLib.bioio import getTempDirectory
 from sonLib.bioio import system
 from sonLib.bioio import popenCatch
 
-from jobTree.scriptTree.target import Target 
-from jobTree.scriptTree.stack import Stack
-from jobTree.src.master import getJobFileDirName, getConfigFileName
-from jobTree.src.jobTreeStatus import parseJobFiles
+from toil.job import Job
+from toil.lib.bioio import setLoggingFromOptions
 
 from cactus.progressive.multiCactusProject import MultiCactusProject
 from cactus.shared.experimentWrapper import ExperimentWrapper
@@ -65,11 +62,10 @@ def initParser():
     
     parser = OptionParser(usage=usage)
 
-    #JobTree Options (method below now adds an option group)
-    Stack.addJobTreeOptions(parser)
-    #Progressive Cactus will handle where the jobtree path is
-    parser.remove_option("--jobTree")
-
+    #Toil Options (method below now adds an option group)
+    Job.Runner.addToilOptions(parser)
+    #progressive cactus will handle where the toil path is
+    parser.remove_option("--jobStore")
 
     #Progressive Cactus Options
     parser.add_option("--optionsFile", dest="optionsFile",
@@ -92,8 +88,8 @@ def initParser():
                       default=False)
     parser.add_option("--autoAbortOnDeadlock", dest="autoAbortOnDeadlock",
                       action="store_true",
-                      help="Abort automatically when jobTree monitor" +
-                      " suspects a deadlock by deleting the jobTree folder." +
+                      help="Abort automatically when toil monitor" +
+                      " suspects a deadlock by deleting the toil folder." +
                       " Will guarantee no trailing ktservers but still " +
                       " dangerous to use until we can more robustly detect " +
                       " deadlocks.",
@@ -188,12 +184,12 @@ def validateInput(workDir, outputHalFile, options):
             raise RuntimeError("Invalid ktserver type specified: %s. Must be "
                                "memory, snapshot or disk" % options.ktType)    
 
-# Convert the jobTree options taken in by the parser back
+# Convert the toil options taken in by the parser back
 # out to command line options to pass to progressive cactus
-def getJobTreeCommands(jtPath, parser, options):
-    cmds = "--jobTree %s" % jtPath
+def getToilCommands(jtPath, parser, options):
+    cmds = "--jobStore %s" % jtPath
     for optGroup in parser.option_groups:
-        if optGroup.title.startswith("jobTree") or optGroup.title.startswith("Jobtree"):
+        if optGroup.title.startswith("toil") or optGroup.title.startswith("Toil"):
             for opt in optGroup.option_list:
                 if hasattr(options, opt.dest) and \
                     getattr(options, opt.dest) != optGroup.defaults[opt.dest]:
@@ -227,7 +223,7 @@ def getEnvFilePath():
 
 # If specified with the risky --autoAbortOnDeadlock option, we call this to
 # force an abort if the jobStatusMonitor thinks it's hopeless.
-# We delete the jobTreePath to get rid of kyoto tycoons.
+# We delete the toilPath to get rid of kyoto tycoons.
 def abortFunction(jtPath, options):
     def afClosure():
         sys.stderr.write('\nAborting due to deadlock (prevent with'
@@ -341,15 +337,15 @@ def main():
         outputHalFile = args[2]
         validateInput(workDir, outputHalFile, options)
 
-        jtPath = os.path.join(workDir, "jobTree")
+        jtPath = os.path.join(workDir, "toil")
         stage = 1
         print "\nBeginning Alignment"
         system("rm -rf %s" % jtPath) 
         projWrapper = ProjectWrapper(options, seqFile, workDir)
         projWrapper.writeXml()
-        jtCommands = getJobTreeCommands(jtPath, parser, options)
+        jtCommands = getToilCommands(jtPath, parser, options)
         runCactus(workDir, jtCommands, jtPath, options)
-        cmd = 'jobTreeStatus --failIfNotComplete --jobTree %s > /dev/null 2>&1 ' %\
+        cmd = 'toil status --failIfNotComplete %s > /dev/null 2>&1 ' %\
               jtPath
         system(cmd)
 
