@@ -10,7 +10,7 @@ modules = ${externalModules} ${ucscModules}
 
 all : envRefreshRule virtPyRule toilRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule datasets ${ucscModules:%=ucsc.%}
 
-justUCSC : ${ucscModules:%=ucsc.%}
+justUCSC : ${ucscModules:%=ucsc.%} toilRule
 
 envRefreshRule:
 	rm -f ${myEnv}
