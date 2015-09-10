@@ -40,7 +40,7 @@ drmaaPythonRule :
 endif
 
 toilRule:
-	. ${myEnv} && pip install --upgrade pip && cd toil && make develop
+	. ${myEnv} && pip install git+http://github.com/bd2kgenomics/toil@2d6111d386ac4d9c0b480fbc5b4c619df902a6db
 
 zlibRule :
 	cd zlib && ./configure --prefix=$(PWD)/zlib && make && make install
