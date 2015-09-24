@@ -199,7 +199,7 @@ def validateInput(workDir, outputHalFile, options):
 ##                        cmds += " \"%s\"" % getattr(options, opt.dest)
 #    return cmds
 def getToilCommands(jtPath, parser, options):
-    return ""
+    return "--stats"
 
 # Go through a text file and add every word inside to an arguments list
 # which will be prepended to sys.argv.  This way both the file and
