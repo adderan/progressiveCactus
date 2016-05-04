@@ -20,3 +20,6 @@ ucsc:
 
 ucscClean:
 	cd submodules && make justUCSCClean
+
+clusterNode:
+	cd submodules && make clusterNode
