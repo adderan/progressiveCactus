@@ -1,28 +1,33 @@
 include include.mk
 
-externalModules = zlib tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast kentToolBinaries
+externalModules = zlib tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast
 ucscModules = sonLib jobTree pinchesAndCacti matchingAndOrdering cactus hal cactus2hal
 
 modules = ${externalModules} ${ucscModules}
 #modules = ${ucsc}
 
-.PHONY: all %.all justUCSC %.justUCSC envRefreshRule virtPyRule pbsDrmaaRule drmaaPythonRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule kentToolBinariesRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean zlibClean cabinetClean pbsDrmaaClean hdf5Clean clapckClean phastClean kentToolBinariesClean test %.test datasets
+.PHONY: all %.all justUCSC %.justUCSC envRefreshRule virtPyRule toilRule pbsDrmaaRule drmaaPythonRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean zlibClean cabinetClean pbsDrmaaClean hdf5Clean clapckClean phastClean test %.test datasets
 
-all : envRefreshRule virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule datasets ${ucscModules:%=ucsc.%}
+all : envRefreshRule virtPyRule toilRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule hdf5Rule datasets ${ucscModules:%=ucsc.%}
 
-justUCSC : ${ucscModules:%=ucsc.%}
+justUCSC : ${ucscModules:%=ucsc.%} toilRule
+
+clusterNode : envRefreshRule virtPyRule toilRule
 
 envRefreshRule:
 	rm -f ${myEnv}
 
 virtPyRule :
-	python $(PWD)/virtualenv/virtualenv.py ${virtPyDir}
+	python $(PWD)/virtualenv/virtualenv.py --system-site-packages ${virtPyDir}
 	. ${virtPyEnv} && cd $(PWD)/networkx && ${virtPy} setup.py install
-	. ${virtPyEnv} && cd $(PWD)/psutil/ && ${virtPy} setup.py install
+	. ${virtPyEnv} && pip install psutil
 	. ${virtPyEnv} && cd $(PWD)/biopython/ && echo y | ${virtPy} setup.py install | cat
 	cp ${virtPyEnv} ${myEnv}
 	echo export PYTHONPATH=$(PWD):\$$PYTHONPATH >> ${myEnv}
 	echo export PATH=${virtPyDir}/bin:\$$PATH >> ${myEnv}
+
+toilRule :
+	. ${myEnv} && pip install --upgrade pip && pip install --upgrade ${PWD}/toil[aws,mesos]
 
 ifeq ($(enablePBSTorque), yes)
 pbsDrmaaRule :
@@ -79,10 +84,6 @@ phastRule :
 	cd .
 endif
 
-kentToolBinariesRule :
-	cd kentToolBinaries && make
-	echo export PATH=$(PWD)/kentToolBinaries:\$$PATH >> ${myEnv}
-
 hdf5Rule :
 	cd hdf5 &&./configure --prefix=$(PWD)/hdf5 --enable-cxx && CFLAGS=-std=c99 make -e && make install
 	echo export PATH=$(PWD)/hdf5/bin:\$$PATH >> ${myEnv}
@@ -95,7 +96,7 @@ ucsc.%:
 	cd $* && make
 	echo export PATH=$(PWD)/$*/bin:\$$PATH >> ${myEnv}
 
-clean: cabinetClean hdf5Clean pbsDrmaaClean zlibClean clapackClean phastClean kentToolBinariesClean ${ucscModules:%=clean.%}
+clean: cabinetClean hdf5Clean pbsDrmaaClean zlibClean clapackClean phastClean ${ucscModules:%=clean.%}
 
 clean.%:
 	cd $* && make clean
@@ -136,9 +137,6 @@ else
 phastClean :
 	cd .
 endif
-
-kentToolBinariesClean :
-	cd kentToolBinaries && make clean
 
 hdf5Clean:
 	cd hdf5 && make clean

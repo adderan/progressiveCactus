@@ -26,8 +26,7 @@ import math
 import time
 import random
 import copy
-from optparse import OptionParser
-from optparse import OptionGroup
+from argparse import ArgumentParser
 import imp
 import socket
 import signal
@@ -35,15 +34,12 @@ import traceback
 import datetime
 
 from sonLib.bioio import logger
-from sonLib.bioio import setLoggingFromOptions
 from sonLib.bioio import getTempDirectory
 from sonLib.bioio import system
 from sonLib.bioio import popenCatch
 
-from jobTree.scriptTree.target import Target 
-from jobTree.scriptTree.stack import Stack
-from jobTree.src.master import getJobFileDirName, getConfigFileName
-from jobTree.src.jobTreeStatus import parseJobFiles
+from toil.lib.bioio import setLoggingFromOptions
+from toil.job import Job
 
 from cactus.progressive.multiCactusProject import MultiCactusProject
 from cactus.shared.experimentWrapper import ExperimentWrapper
@@ -63,34 +59,36 @@ def initParser():
              "exteremely large)\n"\
              "  <outputHalFile>\tPath of output alignment in .hal format."
     
-    parser = OptionParser(usage=usage)
+    parser = ArgumentParser(usage=usage)
 
-    #JobTree Options (method below now adds an option group)
-    Stack.addJobTreeOptions(parser)
-    #Progressive Cactus will handle where the jobtree path is
-    parser.remove_option("--jobTree")
-
+    #Progressive cactus arguments
+    parser.add_argument("seqFile", help = "Seq file")
+    parser.add_argument("workDir", help = "Work dir")
+    parser.add_argument("outputHalFile", help = "Output HAL file")
 
     #Progressive Cactus Options
-    parser.add_option("--optionsFile", dest="optionsFile",
+    parser.add_argument("--jobStore", dest="jobStore",
+                      help="JobStore to use for Toil. If not given,\
+                      the FileJobStore will be used.", default=None)
+    parser.add_argument("--optionsFile", dest="optionsFile",
                       help="Text file containing command line options to use as"\
                       " defaults", default=None)
-    parser.add_option("--database", dest="database",
+    parser.add_argument("--database", dest="database",
                       help="Database type: tokyo_cabinet or kyoto_tycoon"
                       " [default: %default]",
                       default="kyoto_tycoon")
-    parser.add_option("--outputMaf", dest="outputMaf",
+    parser.add_argument("--outputMaf", dest="outputMaf",
                       help="[DEPRECATED use hal2maf on the ouput file instead] Path of output alignment in .maf format.  This option should be avoided and will soon be removed.  It may cause sequence names to be mangled, and use a tremendous amount of memory. ",
                       default=None)
-    parser.add_option("--configFile", dest="configFile",
+    parser.add_argument("--configFile", dest="configFile",
                       help="Specify cactus configuration file",
                       default=None)
-    parser.add_option("--legacy", dest="legacy", action="store_true", help=
+    parser.add_argument("--legacy", dest="legacy", action="store_true", help=
                       "Run cactus directly on all input sequences "
                       "without any progressive decomposition (ie how it "
                       "was originally published in 2011)",
                       default=False)
-    parser.add_option("--autoAbortOnDeadlock", dest="autoAbortOnDeadlock",
+    parser.add_argument("--autoAbortOnDeadlock", dest="autoAbortOnDeadlock",
                       action="store_true",
                       help="Abort automatically when jobTree monitor" +
                       " suspects a deadlock by deleting the jobTree folder." +
@@ -98,17 +96,17 @@ def initParser():
                       " dangerous to use until we can more robustly detect " +
                       " deadlocks.",
                       default=False)
-    parser.add_option("--overwrite", dest="overwrite", action="store_true",
+    parser.add_argument("--overwrite", dest="overwrite", action="store_true",
                       help="Re-align nodes in the tree that have already" +
                       " been successfully aligned.",
                       default=False)
-    parser.add_option("--rootOutgroupDists", dest="rootOutgroupDists",
+    parser.add_argument("--rootOutgroupDists", dest="rootOutgroupDists",
                       help="root outgroup distance (--rootOutgroupPaths must " +
                       "be given as well)", default=None)
-    parser.add_option("--rootOutgroupPaths", dest="rootOutgroupPaths", type=str,
+    parser.add_argument("--rootOutgroupPaths", dest="rootOutgroupPaths", type=str,
                       help="root outgroup path (--rootOutgroup must be given " +
                       "as well)", default=None)
-    parser.add_option("--root", dest="root", help="Name of ancestral node (which"
+    parser.add_argument("--root", dest="root", help="Name of ancestral node (which"
                       " must appear in NEWICK tree in <seqfile>) to use as a "
                       "root for the alignment.  Any genomes not below this node "
                       "in the tree may be used as outgroups but will never appear"
@@ -116,39 +114,39 @@ def initParser():
                       " of the tree is used. ", default=None)
 
     #Kyoto Tycoon Options
-    ktGroup = OptionGroup(parser, "kyoto_tycoon Options",
+    ktGroup = parser.add_argument_group("kyoto_tycoon Options",
                           "Kyoto tycoon provides a client/server framework "
                           "for large in-memory hash tables and is available "
                           "via the --database option.")
-    ktGroup.add_option("--ktPort", dest="ktPort",
+    ktGroup.add_argument("--ktPort", dest="ktPort",
                        help="starting port (lower bound of range) of ktservers"
                        " [default: %default]",
                        default=1978)
-    ktGroup.add_option("--ktHost", dest="ktHost",
+    ktGroup.add_argument("--ktHost", dest="ktHost",
                        help="The hostname to use for connections to the "
                        "ktserver (this just specifies where nodes will attempt"
                        " to find the server, *not* where the ktserver will be"
                        " run)",
                        default=None)
-    ktGroup.add_option("--ktType", dest="ktType",
+    ktGroup.add_argument("--ktType", dest="ktType",
                        help="Kyoto Tycoon server type "
                        "(memory, snapshot, or disk)"
                        " [default: %default]",
                        default='memory')
     # sonlib doesn't allow for spaces in attributes in the db conf
     # which renders this options useless
-    #ktGroup.add_option("--ktOpts", dest="ktOpts",
+    #ktGroup.add_argument("--ktOpts", dest="ktOpts",
     #                   help="Command line ktserver options",
     #                   default=None)
-    ktGroup.add_option("--ktCreateTuning", dest="ktCreateTuning",
+    ktGroup.add_argument("--ktCreateTuning", dest="ktCreateTuning",
                        help="ktserver options when creating db "\
                             "(ex #bnum=30m#msiz=50g)",
                        default=None)
-    ktGroup.add_option("--ktOpenTuning", dest="ktOpenTuning",
+    ktGroup.add_argument("--ktOpenTuning", dest="ktOpenTuning",
                        help="ktserver options when opening existing db "\
                             "(ex #opts=ls#ktopts=p)",
                        default=None)
-    parser.add_option_group(ktGroup)
+    parser.add_argument_group(ktGroup)
  
     return parser
 
@@ -187,20 +185,6 @@ def validateInput(workDir, outputHalFile, options):
            options.ktType.lower() != 'disk':
             raise RuntimeError("Invalid ktserver type specified: %s. Must be "
                                "memory, snapshot or disk" % options.ktType)    
-
-# Convert the jobTree options taken in by the parser back
-# out to command line options to pass to progressive cactus
-def getJobTreeCommands(jtPath, parser, options):
-    cmds = "--jobTree %s" % jtPath
-    for optGroup in parser.option_groups:
-        if optGroup.title.startswith("jobTree") or optGroup.title.startswith("Jobtree"):
-            for opt in optGroup.option_list:
-                if hasattr(options, opt.dest) and \
-                    getattr(options, opt.dest) != optGroup.defaults[opt.dest]:
-                    cmds += " %s" % str(opt)
-                    if opt.nargs > 0:
-                        cmds += " \"%s\"" % getattr(options, opt.dest)
-    return cmds
 
 # Go through a text file and add every word inside to an arguments list
 # which will be prepended to sys.argv.  This way both the file and
@@ -243,7 +227,7 @@ def abortFunction(jtPath, options):
 # Run cactus progressive on the project that has been created in workDir.
 # Any jobtree options are passed along.  Should probably look at redirecting
 # stdout/stderr in the future.
-def runCactus(workDir, jtCommands, jtPath, options):
+def runCactus(workDir, toilCommands, toilPath, options):
     envFile = getEnvFilePath()
     pjPath = os.path.join(workDir, ProjectWrapper.alignmentDirName,
                           '%s_project.xml' % ProjectWrapper.alignmentDirName)
@@ -259,13 +243,13 @@ def runCactus(workDir, jtCommands, jtPath, options):
     logHandle.write("\n%s: Beginning Progressive Cactus Alignment\n\n" % str(
         datetime.datetime.now()))
     logHandle.close()
-    cmd = '. %s && cactus_progressive.py %s %s %s >> %s 2>&1' % (envFile,
-                                                                 jtCommands,
+    cmd = '. %s && cactus_progressive.py %s --project %s %s >> %s 2>&1' % (envFile,
+                                                                 toilCommands,
                                                                  pjPath,
                                                                  overwriteFlag,
                                                                  logFile)
-    jtMonitor = JobStatusMonitor(jtPath, pjPath, logFile,
-                                 deadlockCallbackFn=abortFunction(jtPath,
+    jtMonitor = JobStatusMonitor(toilPath, pjPath, logFile,
+                                 deadlockCallbackFn=abortFunction(toilPath,
                                                                   options))
     if options.database == "kyoto_tycoon":
         jtMonitor.daemon = True
@@ -317,41 +301,42 @@ def main():
     workDir = None
     try:
         parser = initParser()
-        options, args = parser.parse_args()
+        options, toilOptions = parser.parse_known_args()
+        toilPath = os.path.join(options.workDir, "toil")
+        if options.jobStore:
+            toilOptions.append(options.jobStore)
+            sys.argv.append(options.jobStore)
+        else:
+            toilOptions.append(toilPath)
+            sys.argv.append(toilPath)
+        Job.Runner.addToilOptions(parser)
+        options = parser.parse_args()
+
         if (options.rootOutgroupDists is not None) \
         ^ (options.rootOutgroupPaths is not None):
             parser.error("--rootOutgroupDists and --rootOutgroupPaths must be " +
                          "provided together")
-        if len(args) == 0:
-            parser.print_help()
-            return 1
-        if len(args) != 3:
-            raise RuntimeError("Error parsing command line. Exactly 3 arguments are required but %d arguments were detected: %s" % (len(args), str(args)))
         
         if options.optionsFile != None:
             fileArgs = parseOptionsFile(options.optionsFile)
-            options, args = parser.parse_args(fileArgs + sys.argv[1:])
-            if len(args) != 3:
-                raise RuntimeError("Error parsing options file.  Make sure all "
-                                   "options have -- prefix")
+            options = parser.parse_args(fileArgs + sys.argv[1:])
+
         stage = 0
         setLoggingFromOptions(options)
-        seqFile = SeqFile(args[0])
-        workDir = args[1]
-        outputHalFile = args[2]
+        seqFile = SeqFile(options.seqFile)
+        workDir = options.workDir
+        outputHalFile = options.outputHalFile
         validateInput(workDir, outputHalFile, options)
 
-        jtPath = os.path.join(workDir, "jobTree")
         stage = 1
         print "\nBeginning Alignment"
-        system("rm -rf %s" % jtPath) 
+        system("rm -rf %s" % toilPath) 
         projWrapper = ProjectWrapper(options, seqFile, workDir)
         projWrapper.writeXml()
-        jtCommands = getJobTreeCommands(jtPath, parser, options)
-        runCactus(workDir, jtCommands, jtPath, options)
-        cmd = 'jobTreeStatus --failIfNotComplete --jobTree %s > /dev/null 2>&1 ' %\
-              jtPath
-        system(cmd)
+        runCactus(workDir, " ".join(toilOptions), toilPath, options)
+        #cmd = 'toil status --failIfNotComplete %s > /dev/null 2>&1 ' %\
+        #3      toilPath
+        #system(cmd)
 
         stage = 2
         print "Beginning HAL Export"
