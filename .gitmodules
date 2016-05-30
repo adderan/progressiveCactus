@@ -61,3 +61,6 @@
 [submodule "submodules/biopython"]
 	path = submodules/biopython
 	url = https://github.com/biopython/biopython.git
+[submodule "submodules/toil"]
+	path = submodules/toil
+	url = https://github.com/bd2kgenomics/toil
