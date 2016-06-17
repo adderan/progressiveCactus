@@ -18,7 +18,7 @@ envRefreshRule:
 	rm -f ${myEnv}
 
 virtPyRule :
-	python $(PWD)/virtualenv/virtualenv.py --system-site-packages ${virtPyDir}
+	virtualenv --system-site-packages ${virtPyDir}
 	. ${virtPyEnv} && cd $(PWD)/networkx && ${virtPy} setup.py install
 	. ${virtPyEnv} && pip install psutil
 	. ${virtPyEnv} && cd $(PWD)/biopython/ && echo y | ${virtPy} setup.py install | cat
