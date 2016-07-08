@@ -125,9 +125,9 @@ class SeqFile:
                     raise RuntimeError("No sequence specified for %s" % name)
                 else:
                     path = self.pathMap[name]
-                    if not os.path.exists(path):
-                        raise RuntimeError("Sequence path not found: %s" % path)
-                    self.sanityCheckSequence(path)
+                    #if not os.path.exists(path):
+                    #    raise RuntimeError("Sequence path not found: %s" % path)
+                    #self.sanityCheckSequence(path)
 
     def sanityCheckSequence(self, path):
         """Warns the user about common problems with the input sequences."""
@@ -212,8 +212,7 @@ class SeqFile:
             if self.tree.isLeaf(node):
                 name = self.tree.getName(node)
                 path = self.pathMap[name]
-                path.replace(" ", "\ ")
-                seqString += absSymPath(path) + " "
+                seqString += path + " "
         elem.attrib["sequences"] = seqString
         elem.attrib["species_tree"] = NXNewick().writeString(self.tree)
         elem.attrib["config"] = "defaultProgressive"

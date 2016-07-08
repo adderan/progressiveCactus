@@ -243,10 +243,11 @@ def runCactus(workDir, toilCommands, toilPath, options):
     logHandle.write("\n%s: Beginning Progressive Cactus Alignment\n\n" % str(
         datetime.datetime.now()))
     logHandle.close()
-    cmd = '. %s && cactus_progressive.py %s --project %s %s >> %s 2>&1' % (envFile,
+    cmd = '. %s && cactus_progressive.py %s --project %s %s --outputHal %s >> %s 2>&1' % (envFile,
                                                                  toilCommands,
                                                                  pjPath,
                                                                  overwriteFlag,
+                                                                 options.outputHalFile,
                                                                  logFile)
     jtMonitor = JobStatusMonitor(toilPath, pjPath, logFile,
                                  deadlockCallbackFn=abortFunction(toilPath,
@@ -294,6 +295,7 @@ def extractOutput(workDir, outputHalFile, options):
         datetime.datetime.now()))
     logHandle.close()
 
+
 def main():
     # init as dummy function
     cleanKtFn = lambda x,y:x
@@ -326,7 +328,9 @@ def main():
         seqFile = SeqFile(options.seqFile)
         workDir = options.workDir
         outputHalFile = options.outputHalFile
-        validateInput(workDir, outputHalFile, options)
+        if not os.path.isdir(workDir):
+            os.makedirs(workDir)
+        #validateInput(workDir, outputHalFile, options)
 
         stage = 1
         print "\nBeginning Alignment"
@@ -334,15 +338,6 @@ def main():
         projWrapper = ProjectWrapper(options, seqFile, workDir)
         projWrapper.writeXml()
         runCactus(workDir, " ".join(toilOptions), toilPath, options)
-        #cmd = 'toil status --failIfNotComplete %s > /dev/null 2>&1 ' %\
-        #3      toilPath
-        #system(cmd)
-
-        stage = 2
-        print "Beginning HAL Export"
-        extractOutput(workDir, outputHalFile, options)
-        print "Success.\n" "Temporary data was left in: %s\n" \
-              % workDir
         
         return 0
     
