@@ -15,7 +15,7 @@
 	url = git://github.com/glennhickey/hal.git
 [submodule "submodules/cactus2hal"]
 	path = submodules/cactus2hal
-	url = git://github.com/glennhickey/cactus2hal.git
+	url = git://github.com/adderan/cactus2hal.git
 [submodule "submodules/cactus"]
 	path = submodules/cactus
 	url = git://github.com/benedictpaten/cactus.git
