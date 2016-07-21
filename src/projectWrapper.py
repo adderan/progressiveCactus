@@ -154,19 +154,12 @@ class ProjectWrapper:
         else:
             fixNames=0
         if os.path.exists(projPath):
-           if not self.isSameAsExisting(expPath, projPath, fixNames):
-               raise RuntimeError("Existing project %s not " % projPath+
-                                  "compatible with current input.  Please "
-                                  "erase the working directory or rerun "
-                                  "with the --overwrite option to start "
-                                  "from scratch.")
-           else:
-               logPath = os.path.join(self.workingDir, 'cactus.log')
-               logFile = open(logPath, "a")
-               logFile.write("\nContinuing existing alignment.  Use "
-                             "--overwrite or erase the working directory to "
-                             "force restart from scratch.\n")
-               logFile.close()
+           logPath = os.path.join(self.workingDir, 'cactus.log')
+           logFile = open(logPath, "a")
+           logFile.write("\nContinuing existing alignment.  Use "
+                         "--overwrite or erase the working directory to "
+                         "force restart from scratch.\n")
+           logFile.close()
         else:
             cmd = "cactus_createMultiCactusProject.py \"%s\" \"%s\" --fixNames=%d" % (
                 expPath, projPath, fixNames)

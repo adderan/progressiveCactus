@@ -112,6 +112,8 @@ def initParser():
                       "in the tree may be used as outgroups but will never appear"
                       " in the output.  If no root is specifed then the root"
                       " of the tree is used. ", default=None)
+    parser.add_argument("--resume", dest="resume", 
+                      help="Resume the workflow", action="store_true")
 
     #Kyoto Tycoon Options
     ktGroup = parser.add_argument_group("kyoto_tycoon Options",
@@ -238,15 +240,20 @@ def runCactus(workDir, toilCommands, toilPath, options):
         system("rm -f %s" % logFile)
     else:
         overwriteFlag = ''
+    if options.resume:
+        resumeFlag = "--resume"
+    else:
+        resumeFlag = ""
 
     logHandle = open(logFile, "a")
     logHandle.write("\n%s: Beginning Progressive Cactus Alignment\n\n" % str(
         datetime.datetime.now()))
     logHandle.close()
-    cmd = '. %s && cactus_progressive.py %s --project %s %s --outputHal %s >> %s 2>&1' % (envFile,
+    cmd = '. %s && cactus_progressive.py %s --project %s %s %s --outputHal %s >> %s 2>&1' % (envFile,
                                                                  toilCommands,
                                                                  pjPath,
                                                                  overwriteFlag,
+                                                                 resumeFlag,
                                                                  options.outputHalFile,
                                                                  logFile)
     jtMonitor = JobStatusMonitor(toilPath, pjPath, logFile,
