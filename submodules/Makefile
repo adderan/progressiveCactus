@@ -1,14 +1,14 @@
 include include.mk
 
-externalModules = zlib tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast kentToolBinaries
-ucscModules = sonLib jobTree pinchesAndCacti matchingAndOrdering cactus hal cactus2hal
+externalModules = zlib tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast kentToolBinaries sparsehash bamtools sga
+ucscModules = sonLib jobTree pinchesAndCacti matchingAndOrdering cactus hal cactus2hal cPecan
 
 modules = ${externalModules} ${ucscModules}
 #modules = ${ucsc}
 
-.PHONY: all %.all justUCSC %.justUCSC envRefreshRule virtPyRule pbsDrmaaRule drmaaPythonRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule kentToolBinariesRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean zlibClean cabinetClean pbsDrmaaClean hdf5Clean clapckClean phastClean kentToolBinariesClean test %.test datasets
+.PHONY: all %.all justUCSC %.justUCSC envRefreshRule virtPyRule pbsDrmaaRule drmaaPythonRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule kentToolBinariesRule sparsehashRule bamtoolsRule sgaRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean zlibClean cabinetClean pbsDrmaaClean hdf5Clean clapckClean phastClean kentToolBinariesClean sparsehashClean bamtoolsClean sgaClean test %.test datasets
 
-all : envRefreshRule virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule datasets ${ucscModules:%=ucsc.%}
+all : envRefreshRule virtPyRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule kentToolBinariesRule hdf5Rule sparsehashRule bamtoolsRule sgaRule datasets ${ucscModules:%=ucsc.%}
 
 justUCSC : ${ucscModules:%=ucsc.%}
 
@@ -16,7 +16,7 @@ envRefreshRule:
 	rm -f ${myEnv}
 
 virtPyRule :
-	python $(PWD)/virtualenv/virtualenv.py ${virtPyDir}
+	virtualenv ${virtPyDir}
 	. ${virtPyEnv} && cd $(PWD)/networkx && ${virtPy} setup.py install
 	. ${virtPyEnv} && cd $(PWD)/psutil/ && ${virtPy} setup.py install
 	. ${virtPyEnv} && cd $(PWD)/biopython/ && echo y | ${virtPy} setup.py install | cat
@@ -87,6 +87,16 @@ hdf5Rule :
 	cd hdf5 &&./configure --prefix=$(PWD)/hdf5 --enable-cxx && CFLAGS=-std=c99 make -e && make install
 	echo export PATH=$(PWD)/hdf5/bin:\$$PATH >> ${myEnv}
 
+sparsehashRule :
+	cd sparsehash && ./configure --prefix=${PWD}/sparsehash && make && make install
+
+bamtoolsRule :
+	mkdir -p bamtools/build
+	cd bamtools/build && cmake .. && make
+sgaRule : sparsehashRule bamtoolsRule
+	cd sga/src && ./autogen.sh && ./configure --with-sparsehash=${PWD}/sparsehash --with-bamtools=${PWD}/bamtools --prefix=${PWD}/sga && make && make install
+	echo export PATH=${PWD}/sga/bin:\$$PATH >> ${myEnv}
+
 
 # Important to export environment to override sonlib/include.mk
 export
@@ -142,6 +152,15 @@ kentToolBinariesClean :
 
 hdf5Clean:
 	cd hdf5 && make clean
+
+sparsehashClean :
+	cd sparsehash && make clean
+
+bamtoolsClean :
+	cd bamtools && make clean
+
+sgaClean :
+	cd sga/src && make clean
 
 test: ${ucscModules:%=test.%}
 

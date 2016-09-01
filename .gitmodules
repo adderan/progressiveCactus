@@ -61,3 +61,18 @@
 [submodule "submodules/biopython"]
 	path = submodules/biopython
 	url = git://github.com/biopython/biopython.git
+[submodule "cPecan"]
+	path = cPecan
+	url = https://github.com/benedictpaten/cPecan
+[submodule "submodules/cPecan"]
+	path = submodules/cPecan
+	url = https://github.com/benedictpaten/cPecan
+[submodule "submodules/sparsehash"]
+	path = submodules/sparsehash
+	url = https://github.com/sparsehash/sparsehash
+[submodule "submodules/bamtools"]
+	path = submodules/bamtools
+	url = https://github.com/pezmaster31/bamtools
+[submodule "submodules/sga"]
+	path = submodules/sga
+	url = https://github.com/jts/sga
