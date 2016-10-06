@@ -6,12 +6,12 @@ sonLibPath=${sonLibRootPath}/lib
 #OVERRIDE SONLIB WITH LOCAL DBS (because now sonlib won't redefine if exist)
 tcPrefix = $(PWD)/tokyocabinet
 tokyoCabinetIncl = -I ${tcPrefix}/include -DHAVE_TOKYO_CABINET=1
-tokyoCabinetLib = -L${tcPrefix}/lib -Wl,-rpath,${tcPrefix}/lib -ltokyocabinet -lz -lpthread -lm
+tokyoCabinetLib = -L${tcPrefix}/lib -Wl,-Bstatic -ltokyocabinet -Wl,-Bdynamic -lz -lpthread -lm
 
 kcPrefix =$(PWD)/kyotocabinet
 ttPrefix =$(PWD)/kyototycoon
-kyotoTycoonIncl = -I${kcPrefix}/include -I${ttPrefix}/include -DHAVE_KYOTO_TYCOON=1 -I$(PWD)/zlib/include 
-kyotoTycoonLib = -L$(PWD)/zlib/lib -L${ttPrefix}/lib -Wl,-rpath,${ttPrefix}/lib -lkyototycoon -L${kcPrefix}/lib -Wl,-rpath,${kcPrefix}/lib -lkyotocabinet -Wl,-rpath,$(PWD)/zlib/lib -lz -lpthread -lm -lstdc++
+kyotoTycoonIncl = -I${kcPrefix}/include -I${ttPrefix}/include -DHAVE_KYOTO_TYCOON=1
+kyotoTycoonLib = -L${ttPrefix}/lib -Wl,-Bstatic -lkyototycoon -L${kcPrefix}/lib -Wl,-Bstatic -lkyotocabinet -Wl,-Bdynamic -lz -lpthread -lm -lstdc++
 
 #DISABLE MYSQUL
 mysqlIncl = 
@@ -38,9 +38,9 @@ myEnv = $(PWD)/../environment
 
 #kyoto tycoon et al have problems with shared libraries on the cluster
 #but shared libraries seem to be necessary to build on osx.
-LDFLAGS := -L$(PWD)/zlib/lib -L$(PWD)/kyotocabinet/lib $(LDFLAGS)
+LDFLAGS := -L$(PWD)/kyotocabinet/lib $(LDFLAGS)
 CXXFLAGS := $(cppflags) $(CXXFLAGS)
-LD_LIBRARY_PATH := $(PWD)/zlib/lib:$(PWD)/kyotocabinet/lib:$(PWD)/kyototycoon/lib:$(LD_LIBRARY_PATH)
+LD_LIBRARY_PATH := $(PWD)/kyotocabinet/lib:$(PWD)/kyototycoon/lib:$(LD_LIBRARY_PATH)
 #UNAME := $(shell uname)
 #ifeq ($(UNAME), Darwin)
 ktlinkingflags =

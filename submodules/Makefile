@@ -1,84 +1,39 @@
 include include.mk
 
-externalModules = zlib tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast
-ucscModules = sonLib jobTree pinchesAndCacti matchingAndOrdering cactus hal cactus2hal
+externalModules = tokyocabinet kyotocabinet kyototycoon hdf5 pbs-drmaa clapack phast
+ucscModules = sonLib pinchesAndCacti matchingAndOrdering cactus hal cactus2hal
 
 modules = ${externalModules} ${ucscModules}
 #modules = ${ucsc}
 
-.PHONY: all %.all justUCSC %.justUCSC envRefreshRule virtPyRule toilRule pbsDrmaaRule drmaaPythonRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean zlibClean cabinetClean pbsDrmaaClean hdf5Clean clapckClean phastClean test %.test datasets
+.PHONY: all %.all justUCSC %.justUCSC tokyocabinetRule kyotocabinetRule kyototycoonRule hdf5Rule clapackRule phastRule %.ucsc clean %.clean justUCSCClean %.justUCSCClean cabinetClean hdf5Clean clapckClean phastClean%.test
 
-all : envRefreshRule virtPyRule toilRule zlibRule tokyocabinetRule kyotocabinetRule kyototycoonRule pbsDrmaaRule drmaaPythonRule clapackRule phastRule hdf5Rule datasets ${ucscModules:%=ucsc.%}
+all : tokyocabinetRule kyotocabinetRule kyototycoonRule clapackRule phastRule hdf5Rule ${ucscModules:%=ucsc.%}
 
-justUCSC : ${ucscModules:%=ucsc.%} toilRule
+justUCSC : ${ucscModules:%=ucsc.%}
 
-clusterNode : envRefreshRule virtPyRule toilRule
-
-envRefreshRule:
-	rm -f ${myEnv}
-
-virtPyRule :
-	virtualenv --system-site-packages ${virtPyDir}
-	. ${virtPyEnv} && cd $(PWD)/networkx && ${virtPy} setup.py install
-	. ${virtPyEnv} && pip install psutil
-	. ${virtPyEnv} && cd $(PWD)/biopython/ && echo y | ${virtPy} setup.py install | cat
-	cp ${virtPyEnv} ${myEnv}
-	echo export PYTHONPATH=$(PWD):\$$PYTHONPATH >> ${myEnv}
-	echo export PATH=${virtPyDir}/bin:\$$PATH >> ${myEnv}
-
-toilRule :
-	. ${myEnv} && pip install --upgrade pip && pip install --upgrade ${PWD}/toil[aws,mesos]
-
-ifeq ($(enablePBSTorque), yes)
-pbsDrmaaRule :
-	cd pbs-drmaa &&./configure --prefix=$(PWD)/pbs-drmaa && make && make install
-	echo export DRMAA_LIBRARY_PATH=$(PWD)/pbs-drmaa/lib/libdrmaa.so >> ${myEnv}
-
-drmaaPythonRule :
-	. ${virtPyEnv} && cd $(PWD)/drmaa-python/ && ${virtPy} setup.py install
-else
-pbsDrmaaRule :
-	cd .
-
-drmaaPythonRule :
-	cd . 
-endif
-
-zlibRule :
-	cd zlib && ./configure --prefix=$(PWD)/zlib && make && make install
-	echo export PATH=$(PWD)/zlib/bin:\$$PATH >> ${myEnv}
 
 tokyocabinetRule :
-	cd tokyocabinet &&./configure --prefix=$(PWD)/tokyocabinet ${ktlinkingflags} --disable-bzip --with-zlib=$(PWD)/zlib && make && make install
-	echo export PATH=$(PWD)/tokyocabinet/bin:\$$PATH >> ${myEnv}
-	echo export tokyoCabinetIncl=\"-I$(PWD)/tokyocabinet/include -DHAVE_TOKYO_CABINET=1\" >> ${myEnv}
-	echo export tokyoCabinetLib=\"-L$(PWD)/tokyocabinet/lib -Wl,-rpath,$(PWD)/tokyocabinet/lib -ltokyocabinet -lz -lbz2 -lpthread -lm\" >> ${myEnv}
+	cd tokyocabinet &&./configure --prefix=$(PWD)/tokyocabinet --enable-static --disable-shared  --disable-bzip && make && make install
 
 kyotocabinetRule :
-	cd kyotocabinet &&./configure --prefix=$(PWD)/kyotocabinet ${ktlinkingflags} && make && make install
-	echo export PATH=$(PWD)/kyotocabinet/bin:\$$PATH >> ${myEnv}
+	cd kyotocabinet &&./configure --prefix=$(PWD)/kyotocabinet --enable-static --disable-shared  && make && make install
 
 kyototycoonRule :
-	cd kyototycoon &&./configure --prefix=$(PWD)/kyototycoon ${ktlinkingflags} --with-kc=$(PWD)/kyotocabinet && make && make install
-	echo export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) >> ${myEnv}
-	echo export PATH=$(PWD)/kyototycoon/bin:\$$PATH >> ${myEnv}
-	echo export kyotoTycoonIncl=\"-I$(PWD)/kyotocabinet/include -I$(PWD)/kyototycoon/include -DHAVE_KYOTO_TYCOON=1\" >> ${myEnv}
-	echo export kyotoTycoonLib=\"-L$(PWD)/kyototycoon/lib -L$(PWD)/kyotocabinet/lib -Wl,-rpath,$(PWD)/kyototycoon/lib -lkyototycoon -lkyotocabinet -lz -lbz2 -lpthread -lm -lstdc++\" >> ${myEnv}
+	cd kyototycoon &&./configure --prefix=$(PWD)/kyototycoon --enable-static --disable-shared --with-kc=$(PWD)/kyotocabinet && make && make install
 
 ifneq ($(TARGETOS), Darwin)
 CLAPACKPHASTFLAGS = CLAPACKPATH=$(PWD)/clapack
 clapackRule :
 	cd clapack && make f2clib && make blaslib && make lib
 else
-CLAPACKPHASTFLAGS = 
 clapackRule :
 	cd .
 endif
 
 ifdef ENABLE_PHYLOP
 phastRule :
-	cd phast/src && make $(CLAPACKPHASTFLAGS)
-	echo export PATH=$(PWD)/phast/bin:\$$PATH >> ${myEnv}
+	cd phast/src && make CLAPACKPATH=${PWD}/clapack
 else
 phastRule :
 	cd .
@@ -86,7 +41,6 @@ endif
 
 hdf5Rule :
 	cd hdf5 &&./configure --prefix=$(PWD)/hdf5 --enable-cxx && CFLAGS=-std=c99 make -e && make install
-	echo export PATH=$(PWD)/hdf5/bin:\$$PATH >> ${myEnv}
 
 
 # Important to export environment to override sonlib/include.mk
@@ -94,9 +48,8 @@ export
 
 ucsc.%:
 	cd $* && make
-	echo export PATH=$(PWD)/$*/bin:\$$PATH >> ${myEnv}
 
-clean: cabinetClean hdf5Clean pbsDrmaaClean zlibClean clapackClean phastClean ${ucscModules:%=clean.%}
+clean: cabinetClean hdf5Clean clapackClean phastClean ${ucscModules:%=clean.%}
 
 clean.%:
 	cd $* && make clean
@@ -106,21 +59,11 @@ justUCSCClean: ${ucscModules:%=justUCSCClean.%}
 justUCSCClean.%:
 	cd $* && make clean
 
-zlibClean:
-	cd zlib && make clean
 
 cabinetClean:
 	cd kyotocabinet && make clean
 	cd kyototycoon && make clean
 	rm -f $(PWD)/tokyocabinet/lib/*.a $(PWD)/kyotocabinet/lib/*.a  $(PWD)/kyototycoon/lib/*.a
-
-ifeq ($(enablePBSTorque), yes)
-pbsDrmaaClean:
-	cd pbs-drmaa && make clean
-else
-pbsDrmaaClean:
-	cd .
-endif
 
 ifneq ($(TARGETOS), Darwin)
 clapackClean :
@@ -143,8 +86,3 @@ hdf5Clean:
 
 test: ${ucscModules:%=test.%}
 
-test.%:
-	. ${myEnv} && cd $* && make test
-
-datasets:
-	echo export SON_TRACE_DATASETS=$(PWD)/cactusTestData >> ${myEnv}

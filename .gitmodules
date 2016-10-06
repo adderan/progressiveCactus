@@ -1,9 +1,6 @@
 [submodule "submodules/sonLib"]
 	path = submodules/sonLib
 	url = git://github.com/benedictpaten/sonLib.git
-[submodule "submodules/jobTree"]
-	path = submodules/jobTree
-	url = git://github.com/benedictpaten/jobTree.git
 [submodule "submodules/matchingAndOrdering"]
 	path = submodules/matchingAndOrdering
 	url = git://github.com/benedictpaten/matchingAndOrdering.git
@@ -31,27 +28,6 @@
 [submodule "submodules/kyotocabinet"]
 	path = submodules/kyotocabinet
 	url = git://github.com/UCSCReconGroup/kyotocabinet.git
-[submodule "submodules/virtualenv"]
-	path = submodules/virtualenv
-	url = git://github.com/pypa/virtualenv.git
-[submodule "submodules/networkx"]
-	path = submodules/networkx
-	url = git://github.com/networkx/networkx.git
-[submodule "submodules/psutil"]
-	path = submodules/psutil
-	url = git://github.com/tamentis/psutil.git
-[submodule "submodules/cactusTestData"]
-	path = submodules/cactusTestData
-	url = git://github.com/UCSCReconGroup/cactusTestData.git
-[submodule "submodules/pbs-drmaa"]
-	path = submodules/pbs-drmaa
-	url = git://github.com/UCSCReconGroup/pbs-drmaa
-[submodule "submodules/drmaa-python"]
-	path = submodules/drmaa-python
-	url = git://github.com/UCSCReconGroup/drmaa-python
-[submodule "submodules/zlib"]
-	path = submodules/zlib
-	url = git://github.com/madler/zlib
 [submodule "submodules/clapack"]
 	path = submodules/clapack
 	url = git://github.com/UCSCReconGroup/clapack
@@ -61,9 +37,3 @@
 [submodule "submodules/biopython"]
 	path = submodules/biopython
 	url = git://github.com/biopython/biopython.git
-[submodule "submodules/toil"]
-	path = submodules/toil
-	url = https://github.com/bd2kgenomics/toil
-[submodule "submodules/kentToolBinaries"]
-	path = submodules/kentToolBinaries
-	url = https://github.com/adderan/kentToolBinaries
